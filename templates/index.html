@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Chatbot with Gemini API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #response {
+            margin-top: 20px;
+            font-weight: bold;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 RAG Chatbot with Gemini API</h1>
+    <p>Type your question below and get an AI-generated response!</p>
+
+    <textarea id="userInput" placeholder="Ask me anything"></textarea><br>
+    <button onclick="askQuestion()">Submit</button>
+
+    <h2>Response:</h2>
+    <p id="productData">📝 Waiting for response...</p>
+    <p id="aiResponse"></p>
+
+    <script>
+        async function askQuestion() {
+            let prompt = document.getElementById("userInput").value;
+            let productDataElement = document.getElementById("productData");
+            let aiResponseElement = document.getElementById("aiResponse");
+
+            if (!prompt.trim()) {
+                productDataElement.innerHTML = "⚠️ Please enter a question!";
+                return;
+            }
+
+            productDataElement.innerHTML = "⏳ Searching...";
+            aiResponseElement.innerHTML = "";
+
+            try {
+                let response = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: prompt })
+                });
+
+                let data = await response.json();
+                if (data.response) {
+                    productDataElement.innerHTML = "📋 " + data.product_data;
+                    aiResponseElement.innerHTML = "💡 " + data.response;
+                } else {
+                    productDataElement.innerHTML = "❌ Error: " + data.error;
+                }
+            } catch (error) {
+                productDataElement.innerHTML = "❌ Failed to reach server!";
+            }
+        }
+    </script>
+
+</body>
+</html>
